@@ -1,0 +1,27 @@
+
+.bd-subnavbar {
+    z-index: 1020;
+    background-color: #1c1c1c;
+
+}
+
+.bg-img{
+background-image: url('../img/img1.jpg') ;
+        height: 100vh;
+        background-attachment: fixed;
+        background-size: cover;
+
+}
+
+.logo{
+    margin-top: 15%;
+    background-size: Cover;
+    
+}
+
+.linha{
+    background-color:  1px solid #ffc107 !important;
+}
+
+
+
