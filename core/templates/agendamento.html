@@ -1,77 +1,4 @@
-<?php
-// Verificar se foi enviando dados via POST
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  $id = (isset($_POST["id"]) && $_POST["id"] != null) ? $_POST["id"] : "";
-  $telefone = (isset($_POST["telefone"]) && $_POST["telefone"] != null) ? $_POST["telefone"] : "";
-  $nome = (isset($_POST["nome"]) && $_POST["nome"] != null) ? $_POST["nome"] : "";
-  $sobrenome = (isset($_POST["sobrenome"]) && $_POST["sobrenome"] != null) ? $_POST["sobrenome"] : "";
-  $daniversario = (isset($_POST["daniversario"]) && $_POST["daniversario"] != null) ? $_POST["daniversario"] : "";
-  $maniversario = (isset($_POST["maniversario"]) && $_POST["maniversario"] != null) ? $_POST["maniversario"] : "";
-  $servico = (isset($_POST["servico"]) && $_POST["servico"] != null) ? $_POST["servico"] : "";
-  $profissional = (isset($_POST["profissional"]) && $_POST["profissional"] != null) ? $_POST["profissional"] : "";
-  $dia = (isset($_POST["dia"]) && $_POST["dia"] != null) ? $_POST["dia"] : "";
-  $hora = (isset($_POST["hora"]) && $_POST["hora"] != null) ? $_POST["hora"] : "";
-} else if (!isset($id)) {
-  // Se não se não foi setado nenhum valor para variável $id
-  $id = (isset($_GET["id"]) && $_GET["id"] != null) ? $_GET["id"] : "";
-  $telefone = NULL;
-  $nome = NULL;
-  $sobrenome = NULL;
-  $daniversario = NULL;
-  $maniversario = NULL;
-  $servico = NULL;
-  $profissional = NULL;
-  $dia = NULL;
-  $hora = NULL;
-}
-
-try {
-  $conexao = new PDO("mysql:host=localhost; dbname=pro61519_barberweb", "pro61519_barber", "PJI110-0030-osasco");
-  $conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  $conexao->exec("set names utf8");
-} catch (PDOException $erro) {
-  echo "Erro na conexão:" . $erro->getMessage();
-}
-
-// enviar para o banco
-if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
-  try {
-      $stmt = $conexao->prepare("INSERT INTO tb_agenda (telefone, nome, sobrenome, daniversario, maniversario, servico, profissional, dia, hora) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-      $stmt->bindParam(1, $telefone);
-      $stmt->bindParam(2, $nome);
-      $stmt->bindParam(3, $sobrenome);
-      $stmt->bindParam(4, $daniversario);
-      $stmt->bindParam(5, $maniversario);
-      $stmt->bindParam(6, $servico);
-      $stmt->bindParam(7, $profissional);
-      $stmt->bindParam(8, $dia);
-      $stmt->bindParam(9, $hora);
-       
-      if ($stmt->execute()) {
-          if ($stmt->rowCount() > 0) {
-              header("Location: index.php");
-              $id = null;
-              $telefone = null;
-              $nome = null;
-              $sobrenome = null;
-              $daniversario = null;
-              $maniversario = null;
-              $servico = null;
-              $profissional = null;
-              $dia = null;
-              $hora = null;
-          } else {
-              echo "Erro ao tentar efetivar cadastro";
-          }
-      } else {
-             throw new PDOException("Erro: Não foi possível executar a declaração sql");
-      }
-  } catch (PDOException $erro) {
-      echo "Erro: " . $erro->getMessage();
-  }
-}
-?>
-
+{% load static %}
 
 <!doctype html>
 <html lang="pt-br">
@@ -81,9 +8,9 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
   <meta name="author"
     content="Projeto Integrador Univesp - Alunos: BRUNA MICHELE CORREIA RIBEIRO, 2003356; ISAEL RODRIGUES DE FREITAS, 2015634; MARCOS RIBEIRO DE OLIVEIRA, 2005638; SILVIO TACLA ALVES BARBOSA, 1714413; UILMA MATOS DOS SANTOS MELO, 2014371; ABNER JACOMO PELLISSER, 2007979">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/estilo.css" rel="stylesheet">
-  <link href="jquery/jquery-ui.css" rel="stylesheet">
+  <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+  <link href="{% static 'css/estilo.css' %}" rel="stylesheet">
+  <link href="{% static 'jquery/jquery-ui.css' %}" rel="stylesheet">
   
   <title>Yeshua Barber Shop</title>
 </head>
@@ -101,16 +28,16 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
               <li class="nav-item">
-                <a href="index.php" class="nav-link me-2 w-100">Home</a>
+                <a href="index" class="nav-link me-2 w-100">Home</a>
               </li>
               <li class="nav-item">
-              <a href="agendamento.php" class="nav-link me-2 w-100 active">Agendamento</a>
+              <a href="agendamento" class="nav-link me-2 w-100 active">Agendamento</a>
               </li>
               <li class="nav-item">
-                <a href="galeria.php" class="nav-link me-2 w-100">Galeria</a>
+                <a href="galeria" class="nav-link me-2 w-100">Galeria</a>
               </li>
               <li class="nav-item">
-                <a href="catalogo.php" class="nav-link me-2 w-100">Catálogo</a>
+                <a href="catalogo" class="nav-link me-2 w-100">Catálogo</a>
               </li>
             </ul>
             <div class="d-flex">
@@ -151,34 +78,18 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
     <div class="container px-4 py-5 border-bottom">
 <form action="?act=save" method="POST" name="form1">
                 <div class="mb-3">
-                <input type="hidden" name="id" <?php
-            if (isset($id) && $id != null || $id != "") {
-                echo "value=\"{$id}\"";
-            }
-            ?> >
+                <input type="hidden" name="id" >
                   <label for="telefone" class="form-label">Telefone</label>
-                  <input type="text" name="telefone" class="form-control" id="telefone" aria-describedby="telefone" placeholder="Telefone" required <?php
-            if (isset($telefone) && $telefone != null || $telefone != ""){
-                echo "value=\"{$telefone}\"";
-            }
-            ?> >
+                  <input type="text" name="telefone" class="form-control" id="telefone" aria-describedby="telefone" placeholder="Telefone" required >
                   <div id="telefone" class="form-text">*Este número receberá uma mensagem por whatsapp 1 hora antes do agendamento para confirmação.
                 </div>
                 </div>
                 <div class="row mb-3">
                   <div class="col">
-                    <input type="text" name="nome" class="form-control" placeholder="Nome" aria-label="First name" required <?php
-            if (isset($nome) && $nome != null || $nome != ""){
-                echo "value=\"{$nome}\"";
-            }
-            ?> >
+                    <input type="text" name="nome" class="form-control" placeholder="Nome" aria-label="First name" required>
                   </div>
                   <div class="col">
-                    <input type="text" name="sobrenome" class="form-control" placeholder="Sobrenome" aria-label="Last name" required <?php
-            if (isset($sobrenome) && $sobrenome != null || $sobrenome != ""){
-                echo "value=\"{$sobrenome}\"";
-            }
-            ?> >
+                    <input type="text" name="sobrenome" class="form-control" placeholder="Sobrenome" aria-label="Last name" required >
                   </div>
                 </div>
                 <div class="row mb-3">
@@ -186,11 +97,7 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
                   <label for="telefone" class="form-label">Data de Aniversário</label>
                   <div class="row mb-3">
                       <div class="col">
-                  <input name="daniversario" class="form-control" list="mes" placeholder="Mês do aniversário" aria-label="Default select example" required <?php
-            if (isset($daniversario) && $daniversario != null || $daniversario != ""){
-                echo "value=\"{$daniversario}\"";
-            }
-            ?> >
+                  <input name="aniversario" class="form-control" list="mes" placeholder="Mês do aniversário" aria-label="Default select example" required >
                     <datalist id="mes">
                     <option value="Janeiro">Janeiro</option>
                     <option value="Fevereiro">Fevereiro</option>
@@ -208,11 +115,7 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
         </div>
 
             <div class="col">
-            <input class="form-control" list="datadoaniversario" id="exampleDataList" placeholder="Dia do aniversário" name="maniversario" class="form-select col" aria-label="Default select example" required <?php
-            if (isset($maniversario) && $maniversario != null || $maniversario != ""){
-                echo "value=\"{$maniversario}\"";
-            }
-            ?> >
+            <input class="form-control" list="datadoaniversario" id="exampleDataList" placeholder="Dia do aniversário" name="maniversario" class="form-select col" aria-label="Default select example" required>
                   <datalist id="datadoaniversario">
                     <option value="01">01</option>
                     <option value="02">02</option>
@@ -251,11 +154,7 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
         </div>
         </div>
                 <div class="mb-3">
-                  <input class="form-control" list="servicos" placeholder="Selecione o serviço" name="servico" class="form-select" aria-label="Default select example" required <?php
-            if (isset($servico) && $servico != null || $servico != ""){
-                echo "value=\"{$servico}\"";
-            }
-            ?> >
+                  <input class="form-control" list="servicos" placeholder="Selecione o serviço" name="servico" class="form-select" aria-label="Default select example" required >
                     <datalist id="servicos">Selecione o tipo de serviço
                     <option value="Corte">Corte</option>
                     <option value="Pintura">Pintura</option>
@@ -263,11 +162,7 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
           </datalist>
                 </div>
                 <div class="mb-3">
-                  <input list="profissional" placeholder="Selecione o profissional" name="profissional" class="form-select" aria-label="Default select example" required <?php
-            if (isset($profissional) && $profissional != null || $profissional != ""){
-                echo "value=\"{$profissional}\"";
-            }
-            ?> >
+                  <input list="profissional" placeholder="Selecione o profissional" name="profissional" class="form-select" aria-label="Default select example" required >
                     <datalist id="profissional">Selecione o profissional
                     <option value="Adriano">Adriano</option>
                     <option value="Andreia">Andreia</option>
@@ -275,18 +170,10 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
           </datalist>
                 </div>
                 <div class="col mb-3">
-                  <input name="dia" type="text"  class="form-control" placeholder="Selecione a Data" id="datepicker" required <?php
-            if (isset($dia) && $dia != null || $dia != ""){
-              echo "value=\"{$dia}\"";
-            }
-            ?> >
+                  <input name="dia" type="text"  class="form-control" placeholder="Selecione a Data" id="datepicker" required >
                 </div>
                 <div class="mb-3">
-                  <input list="horario" placeholder="Selecione o horário" name="hora" class="form-select" aria-label="Default select example" required <?php
-            if (isset($hora) && $hora != null || $hora != ""){
-                echo "value=\"{$hora}\"";
-            }
-            ?> >
+                  <input list="horario" placeholder="Selecione o horário" name="hora" class="form-select" aria-label="Default select example" required >
                     <datalist id="horario">Selecione o Horário
                     <option value="10:00">10:00</option>
                     <option value="11:00">11:00</option>
@@ -298,7 +185,7 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
                     <option value="17:00">17:00</option>
           </datalist>
                 </div>
-                <input type="submit" value="Agendar" class="btn btn-warning" href="index.php"/>
+                <input type="submit" value="Agendar" class="btn btn-warning" href="index"/>
                <input type="reset" value="Novo" class="btn btn-secondary"/>
         </div>
           </form>
@@ -328,6 +215,5 @@ if (isset($_REQUEST["act"]) && $_REQUEST["act"] == "save" && $telefone != "") {
 <script>
   $("#datepicker").datepicker();
 </script>
-        </body>
-
-        </html>
+</body>
+</html>

@@ -15,3 +15,4 @@ def consulta(request):
 def galeria(request):
     return render(request, 'galeria.html')
 
+
